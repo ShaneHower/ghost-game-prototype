@@ -19,6 +19,7 @@ public class Ghost : MonoBehaviour
     public byte blue;
 
     private bool ghostCollision;
+    private bool isPlaying;
 
     void Start()
     {
@@ -32,9 +33,9 @@ public class Ghost : MonoBehaviour
     private void FixedUpdate()
     {
         // if conductor isn't conducting and the player cursor is over the ghost
-        bool allowPlay = !conductor.isConducting && ghostCollision;
+        bool allowPlay = !conductor.isConducting && ghostCollision && !isPlaying;
 
-        if (Input.GetMouseButton(0) && allowPlay)
+        if (Input.GetMouseButton(0) && allowPlay) 
         {
             activate();
         }
@@ -53,6 +54,7 @@ public class Ghost : MonoBehaviour
 
     public void activate()
     {
+        isPlaying = true;
         image.sprite = onClickSprite;
         image.color = new Color32(255, 255, 255, 255);
         audio.Play();
@@ -69,5 +71,6 @@ public class Ghost : MonoBehaviour
     {
         yield return new WaitForSeconds(0.25f);
         setDefaults();
+        isPlaying = false;
     }
 }
