@@ -5,14 +5,11 @@ using UnityEngine;
 public class Conductor : MonoBehaviour
 {
     public bool isConducting;
-    public int sequenceCounter = 0;
+    public bool isPlaying;
+    public List<string> ghostSong;
 
     private Dictionary<string, Ghost> ghostDict = new Dictionary<string, Ghost>();
     private List<string> ghostIds;
-    private List<string> ghostSong;
-
-    private int i = 1;
-    private int randomNum;
 
     // Start is called before the first frame update
     void Start()
@@ -29,31 +26,29 @@ public class Conductor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // We are looping by frame.  Originally I was looping by sequence but I think that may lead to bugs if the frames and loop get out of sync
-        if(isConducting)
+        bool play = isConducting && !isPlaying;
+        if(play)
         {
-            if(i < sequenceCounter)
-            {
-                randomNum = Random.Range(0, 4);
-                string ghostId = ghostIds[randomNum];
-                ghostSong.Add(ghostId);
-
-                Ghost activeGhost = ghostDict[ghostId];
-                activeGhost.activate();
-                StartCoroutine(waiter());
-                i++;
-            }
-            else
-            {
-                isConducting = false;
-                sequenceCounter++;
-            }
+            StartCoroutine(playGhostSong());
         }
     }
 
-    IEnumerator waiter()
+    IEnumerator playGhostSong()
     {
-        yield return new WaitForSeconds(0.5f);
+        isPlaying = true;
+        int randomNum = Random.Range(0, 4);
+        string ghostId = ghostIds[randomNum];
+        ghostSong.Add(ghostId);
+
+        foreach (string id in ghostSong)
+        {
+            Ghost activeGhost = ghostDict[id];
+            activeGhost.activate();
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        isConducting = false;
+        isPlaying = false;
     }
 
 
